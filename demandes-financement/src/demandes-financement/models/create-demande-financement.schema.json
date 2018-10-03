@@ -1,0 +1,19 @@
+{
+  "$ref": "#/definitions/DemandeFinancementType",
+  "definitions": {
+    "DemandeFinancementType": {
+      "type": "object",
+      "definitions": {
+        "title": {
+          "type": "string"
+        },
+        "reference": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

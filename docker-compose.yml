@@ -1,0 +1,64 @@
+version: '3'
+services:
+#  mongo:
+#    image: mongo:latest
+#    ports:
+#      - "27017:27017"
+#    restart: on-failure
+  amqp:
+    image: rabbitmq:management-alpine
+    ports:
+      - "4369:4369"
+      - "5671:5671"
+      - "5672:5672"
+      - "25672:25672"
+      - "15671:15671"
+      - "15672:15672"
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:15672"]
+        interval: 30s
+        timeout: 10s
+        retries: 5
+    restart: on-failure
+  gateway:
+    build: ./gateway
+    environment:
+      AMQP_URL: 'amqp://amqp:5672'
+      MONGO_URL: 'mongodb://mongo:27017/gateway'
+    ports:
+      - "3000:3000"
+      - "9228:9229"
+    depends_on:
+      - amqp
+#      - mongo
+      - demandes-financement
+#      - indexer
+    links:
+      - amqp
+    restart: on-failure
+  demandes-financement:
+    build: ./demandes-financement
+    environment:
+      AMQP_URL: 'amqp://amqp:5672'
+#      MONGO_URL: 'mongodb://mongo:27017/demandes-financement'
+    ports:
+      - "9227:9229"
+    depends_on:
+      - amqp
+#      - mongo
+    links:
+      - amqp
+    restart: on-failure
+  indexer:
+    build: ./indexer
+    environment:
+      AMQP_URL: 'amqp://amqp:5672'
+#      MONGO_URL: 'mongodb://mongo:27017/demandes-financement'
+    ports:
+      - "9226:9229"
+    depends_on:
+      - amqp
+#      - mongo
+    links:
+      - amqp
+    restart: on-failure

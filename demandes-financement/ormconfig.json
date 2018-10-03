@@ -1,0 +1,7 @@
+{
+  "type": "mongodb",
+  "host": "localhost",
+  "database": "demandes-financement",
+  "entities": ["src/**/**.model{.ts,.js}"],
+  "synchronize": true
+}

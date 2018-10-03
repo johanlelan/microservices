@@ -1,0 +1,39 @@
+version: '3'
+services:
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    restart: on-failure
+  elastic:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.3.2
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment: 
+      - http.port=9200
+      - http.cors.allow-origin="http://es-ui:1358"
+      - http.cors.enabled=true
+      - http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
+      - http.cors.allow-credentials=true
+    restart: on-failure
+  es-ui:
+    image: appbaseio/dejavu
+    ports:
+      - "1358:1358"
+    restart: on-failure
+  amqp:
+    image: rabbitmq:management-alpine
+    ports:
+      - "4369:4369"
+      - "5671:5671"
+      - "5672:5672"
+      - "25672:25672"
+      - "15671:15671"
+      - "15672:15672"
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:15672"]
+        interval: 30s
+        timeout: 10s
+        retries: 5
+    restart: on-failure

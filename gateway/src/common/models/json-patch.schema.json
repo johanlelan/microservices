@@ -1,0 +1,31 @@
+{
+  "title": "JSON-PATCH",
+  "type": "array",
+  "items": { "$ref": "#/definitions/patch"},
+  "definitions": {
+    "patch": {
+      "type": "object",
+      "properties": {
+        "op": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string",
+          "pattern": "^/.*$"
+        },
+        "value": {
+          "type": [
+            "object",
+            "string",
+            "number",
+            "array",
+            "null",
+            "boolean"
+          ]
+        }
+      },
+      "required": ["op", "path"],
+      "additionalProperties": false
+    }
+  }
+}
