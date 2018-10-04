@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ClientProxyFactory, ClientProxy, Client } from '@nestjs/microservices';
 import { CreateDemandeFinancementDto } from './interfaces/create-demande-financement.dto';
 import { CreateDemandeFinancementCommand } from './commands/impl/create-demande-financement.command';
@@ -26,6 +26,11 @@ export class DemandeFinancementService {
     const response = await rp.get({
       url: (process.env.ES_URL || 'http://localhost:9200') + `/indexer/demandes-financement/${demandeFinancementId}`,
       json: true,
+    }).catch(err => {
+      // 404 is not considered to be an error
+      if (err.statusCode === 404) return {};
+      Logger.error(err);
+      throw err;
     });
     return response._source;
   }
@@ -38,8 +43,18 @@ export class DemandeFinancementService {
     return response.hits.hits.map(hit => hit._source);
   }
 
+  async search(searchDemandeFinancementDto: any): Promise<DemandeFinancement[]> {
+    const response = await rp.post({
+      url: (process.env.ES_URL || 'http://localhost:9200') + '/indexer/demandes-financement/_search',
+      json: searchDemandeFinancementDto,
+    });
+    // TODO JLL: add range/total and links in response headers
+    return response.hits.hits.map(hit => hit._source);
+  }
+
   create(createDemandeFinancementDto: CreateDemandeFinancementDto): Observable<DemandeFinancement> {
     const pattern = { cmd: 'createDemandeFinancement' };
+    // TODO JLL: add location response header
     return this.client.send<DemandeFinancement>(pattern, createDemandeFinancementDto);
   }
 

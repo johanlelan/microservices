@@ -43,6 +43,29 @@ export class DemandeFinancementController {
     Logger.log(`This action returns all demandes-financement (limit: ${query.limit} items)`);
     return await this.demandeFinancementService.findAll(findDemandeFinancementDto);
   }
+  @Post('_search')
+  async search(
+    @Res() res,
+    @Body() searchDemandeFinancementDto,
+    ): Promise<DemandeFinancement[]> {
+    Logger.log(`This action searches all demandes-financement base on filter body`);
+    const result = await this.demandeFinancementService.search(searchDemandeFinancementDto)
+    .catch(err => {
+      res.status(500);
+      return res.json({
+        id: 'CanNotSearchDemandesFinancement',
+        code: '500.1',
+        links: {
+          about: '',
+        },
+        title: 'Can not search on demandes-financement index',
+        detail: '',
+        source: {},
+        meta: {},
+      });
+    });
+    return res.status(200).json(result);
+  }
   @Get(':demandeFinancementId')
   async findOne(
     @Param('demandeFinancementId') demandeFinancementId,
