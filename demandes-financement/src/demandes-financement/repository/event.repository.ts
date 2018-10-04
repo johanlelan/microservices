@@ -32,5 +32,6 @@ export class EventRepository {
    */
   async save(eventToSave: IEvent): Promise<any> {
     events[(eventToSave as DemandeFinancementEvent).getId()] = eventToSave;
+    return Promise.resolve(eventToSave);
   }
 }
